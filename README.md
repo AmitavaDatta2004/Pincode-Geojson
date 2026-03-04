@@ -1,47 +1,55 @@
-# Indian Pincode Map & GeoJSON API
+<h1 align="center">📍 India Pincode Map & GeoJSON API</h1>
 
-This project contains two major components:
-1. **Interactive Map**: A Next.js frontend map that visualizes Indian Pincode boundaries instantly.
-2. **REST API**: A high-performance Next.js API route that retrieves official GeoJSON boundary polygons for any given Indian Pincode, parsing through ~90MB of geo-data.
+<p align="center">
+  <strong>A high-performance Next.js web app and REST API that visualizes official GeoJSON boundary polygons for 19,312+ Indian Pincodes.</strong>
+</p>
 
-You can use the frontend to visually search pincodes, or expose this API endpoint in any of your independent Next.js or React projects to instantly draw postal boundaries on maps (like Leaflet, Mapbox, or Google Maps) without forcing your clients to download large geospatial datasets.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16.x-black?style=for-the-badge&logo=next.js" />
+  <img src="https://img.shields.io/badge/Leaflet-Map-green?style=for-the-badge&logo=leaflet" />
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Pincodes-19%2C312-orange?style=for-the-badge" />
+</p>
 
 ---
 
-## 🚀 Getting Started Locally
+## ✨ Features
 
-First, install dependencies and run the development server:
+- 🗺️ **Interactive Map** — Instantly visualize any Indian pincode boundary on a full-screen map
+- ⚡ **Fast REST API** — Returns GeoJSON `Feature` objects for any pincode in milliseconds
+- 🧠 **In-Memory Cache** — 90MB dataset loaded once and cached globally for blazing-fast lookups
+- 📄 **API Documentation Page** — Built-in interactive docs with a live API tester at `/documentation`
+- 🔌 **Remote-Friendly** — Use the API in any other Next.js, React, or backend project
+
+---
+
+## 🚀 Getting Started
 
 ```bash
+# Install dependencies
 npm install
+
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the interactive Pincode search map.
+Open [http://localhost:3000](http://localhost:3000) to see the interactive map.
+Open [http://localhost:3000/documentation](http://localhost:3000/documentation) for the API docs.
 
 ---
 
-## 📡 API Endpoint Details
+## 📡 API Endpoint
 
 ### `GET /api/pincode/[code]`
 
-Fetches the complete GeoJSON `Feature` object for a specific 6-digit Indian pincode.
+Returns the complete GeoJSON `Feature` for a given 6-digit Indian pincode.
 
-**URL Parameters:**
-- `[code]` (string, required): The 6-digit Indian Pincode you are querying.
-
-**Example Request:**
+**Example:**
 ```bash
 curl http://localhost:3000/api/pincode/700091
 ```
 
----
-
-## 💻 API Response Usage Examples
-
-### 1. Success Response (200 OK)
-Returns a standard GeoJSON `Feature` object.
-
+**Success Response (200):**
 ```json
 {
   "type": "Feature",
@@ -54,71 +62,57 @@ Returns a standard GeoJSON `Feature` object.
   },
   "geometry": {
     "type": "Polygon",
-    "coordinates": [
-      [
-        [88.411716, 22.584842],
-        [88.418699, 22.583301],
-        /* ... shortened ... */
-        [88.411716, 22.584842]
-      ]
-    ]
+    "coordinates": [[[88.4117, 22.5848], ...]]
   }
 }
 ```
 
-### 2. Usage in Another Next.js App using React-Leaflet
+**Error Responses:**
+| Status | Meaning |
+|--------|---------|
+| 404 | Pincode not found in dataset |
+| 400 | Invalid pincode format |
+| 500 | Server failed to parse data |
 
-To render the returned Pincode boundary on a remote application using React-Leaflet:
+---
+
+## 💻 Usage in Another Project
 
 ```tsx
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 
-export default function RemotePincodeMap({ pincode = '700091' }) {
+export default function PincodeMap({ pincode }: { pincode: string }) {
   const [boundary, setBoundary] = useState(null);
 
   useEffect(() => {
-    async function fetchBoundary() {
-      // Point this URL to your deployed or locally running Next.js API
-      const res = await fetch(`http://localhost:3000/api/pincode/${pincode}`);
-      if (res.ok) {
-        const geojsonData = await res.json();
-        setBoundary(geojsonData);
-      } else {
-        console.error("Pincode not found!");
-      }
-    }
-    fetchBoundary();
+    fetch(`http://localhost:3000/api/pincode/${pincode}`)
+      .then(r => r.json())
+      .then(setBoundary);
   }, [pincode]);
 
   return (
-    <div style={{ height: '400px', width: '100%' }}>
-      <MapContainer center={[22.584842, 88.411716]} zoom={13} style={{ height: '100%' }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        
-        {/* Pass API Response directly to the Data prop */}
-        {boundary && <GeoJSON data={boundary} />}
-        
-      </MapContainer>
-    </div>
+    <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: 400 }}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      {boundary && <GeoJSON data={boundary} />}
+    </MapContainer>
   );
-}
-```
-
-### 3. Error Responses
-
-- **400 Bad Request**: Invalid pincode format provided.
-- **404 Not Found**: The requested pincode does not exist in the boundary dataset.
-- **500 Internal Server Error**: The server failed to parse the underlying GeoJSON database.
-
-```json
-{
-  "error": "Boundary data not found for pincode: 123456"
 }
 ```
 
 ---
 
-## ⚡ Performance Considerations
+## 👨‍💻 Developers
 
-The underlying official GeoJSON dataset is approximately ~90MB. The API caches this object in memory upon the first request globally within the Node process. Subsequent requests to the API skip heavy file I/O operations and instantly search the cached JSON array in memory, returning response objects in just a few milliseconds.
+| Name | Role |
+|------|------|
+| **Amitava Datta** | Developer |
+| **Pranay De** | Developer |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+© 2026 Amitava Datta & Pranay De
