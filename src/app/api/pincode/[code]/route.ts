@@ -24,6 +24,16 @@ function loadGeoJsonData() {
     }
 }
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ code: string }> | { code: string } }
@@ -35,7 +45,7 @@ export async function GET(
     if (!pincode || typeof pincode !== 'string') {
         return NextResponse.json(
             { error: "Invalid pincode provided" },
-            { status: 400 }
+            { status: 400, headers: corsHeaders }
         );
     }
 
@@ -45,7 +55,7 @@ export async function GET(
     if (!isLoaded || !cachedFeatures) {
         return NextResponse.json(
             { error: "Internal server error: Failed to parse boundary data" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 
@@ -55,10 +65,10 @@ export async function GET(
     if (!match) {
         return NextResponse.json(
             { error: `Boundary data not found for pincode: ${pincode}` },
-            { status: 404 }
+            { status: 404, headers: corsHeaders }
         );
     }
 
     // Return the single GeoJSON feature
-    return NextResponse.json(match);
+    return NextResponse.json(match, { headers: corsHeaders });
 }
