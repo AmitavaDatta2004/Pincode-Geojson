@@ -199,9 +199,9 @@ export default function DocsPage() {
                                 <span className={!useLocal ? 'text-blue-400 font-bold' : 'text-gray-500'}>Deployed</span>
                                 <button
                                     onClick={() => setUseLocal(l => !l)}
-                                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${useLocal ? 'bg-green-600' : 'bg-blue-600'}`}
+                                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 overflow-hidden ${useLocal ? 'bg-green-600' : 'bg-blue-600'}`}
                                 >
-                                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${useLocal ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${useLocal ? 'translate-x-[22px]' : 'translate-x-0.5'}`} />
                                 </button>
                                 <span className={useLocal ? 'text-green-400 font-bold' : 'text-gray-500'}>Local</span>
                             </div>
