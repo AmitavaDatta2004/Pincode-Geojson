@@ -1,107 +1,267 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Pincode 700091 - Sech Bhawan SO</title>
+    <title>India Pincode Search</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         body {
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
         }
+
         #map {
             height: 100vh;
             width: 100%;
         }
+
+        #search-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 90%;
+            max-width: 450px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        #pincode-input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #pincode-input:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
+        }
+
+        #search-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: #339af0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        #search-btn:hover {
+            background-color: #228be6;
+        }
+
+        #search-btn:active {
+            transform: scale(0.98);
+        }
+
+        #search-btn:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #loading {
+            position: absolute;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #495057;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(51, 154, 240, 0.3);
+            border-radius: 50%;
+            border-top-color: #339af0;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #error-msg {
+            color: #fa5252;
+            font-size: 14px;
+            font-weight: 500;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
+
 <body>
 
-<div id="map"></div>
+    <div id="search-container">
+        <input type="text" id="pincode-input" placeholder="Enter Pincode (e.g. 700091)" />
+        <button id="search-btn" disabled>Search</button>
+        <div id="error-msg"></div>
+    </div>
+    <div id="loading">
+        <span class="spinner"></span>
+        <span id="loading-text">Loading Pincode Data (~90MB)... Please wait.</span>
+    </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <div id="map"></div>
 
-<script>
-    // Initialize map centered around Salt Lake, Kolkata
-    var map = L.map('map').setView([22.584842, 88.411716], 14);
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    // OpenStreetMap Tile Layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    <script>
+        // Initialize map centered around India
+        var map = L.map('map').setView([20.5937, 78.9629], 5);
 
-    // Your GeoJSON data
-    var geojsonData = {
-        "type": "Feature",
-        "properties": {
-            "Pincode": "700091",
-            "Office_Name": "Sech Bhawan SO",
-            "Division": "Kolkata East",
-            "Region": "Kolkata",
-            "Circle": "West Bengal"
-        },
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-                [88.411716,22.584842],[88.418699,22.583301],[88.423222,22.577277],
-                [88.421203,22.573049],[88.421291,22.572999],[88.42238,22.572468],
-                [88.423884,22.571774],[88.425066,22.571228],[88.425243,22.571147],
-                [88.426066,22.570808],[88.426965,22.570396],[88.428189,22.569834],
-                [88.429178,22.569379],[88.430578,22.568738],[88.431377,22.568375],
-                [88.432453,22.567874],[88.432983,22.567689],[88.433136,22.567687],
-                [88.434527,22.567444],[88.43578,22.567198],[88.435852,22.567144],
-                [88.4361,22.567034],[88.436174,22.567037],[88.436258,22.567144],
-                [88.436254,22.567328],[88.436463,22.568062],[88.436865,22.569571],
-                [88.437188,22.57065],[88.437265,22.57092],[88.437598,22.57181],
-                [88.43833,22.572787],[88.438659,22.573595],[88.438797,22.573933],
-                [88.439347,22.575057],[88.439757,22.575754],[88.440144,22.576584],
-                [88.440264,22.576823],[88.440265,22.576823],[88.441226,22.578731],
-                [88.438553,22.579945],[88.437757,22.58031],[88.437704,22.580499],
-                [88.437689,22.580822],[88.436383,22.581414],[88.436345,22.581431],
-                [88.434989,22.582033],[88.433704,22.582587],[88.433415,22.582993],
-                [88.433613,22.583308],[88.433415,22.583701],[88.435738,22.585123],
-                [88.435738,22.585221],[88.434914,22.585795],[88.433791,22.587406],
-                [88.430618,22.592127],[88.428721,22.594985],[88.427954,22.596107],
-                [88.427188,22.597226],[88.425654,22.599677],[88.424455,22.600966],
-                [88.423312,22.601648],[88.421917,22.597093],[88.421705,22.596509],
-                [88.421623,22.596281],[88.419986,22.591766],[88.41464,22.592648],
-                [88.414538,22.591807],[88.414357,22.59068],[88.414234,22.590541],
-                [88.413295,22.590196],[88.409471,22.588319],[88.411716,22.584842]
-            ]]
+        // OpenStreetMap Tile Layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let allFeatures = [];
+        let currentLayer = null;
+
+        const loadingDiv = document.getElementById('loading');
+        const loadingText = document.getElementById('loading-text');
+        const searchBtn = document.getElementById('search-btn');
+        const pincodeInput = document.getElementById('pincode-input');
+        const errorMsg = document.getElementById('error-msg');
+
+        // Load GeoJSON data
+        async function loadData() {
+            try {
+                loadingDiv.style.display = 'block';
+                searchBtn.disabled = true;
+
+                const response = await fetch('All_India_pincode_Boundary-19312.geojson');
+
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+
+                const data = await response.json();
+                allFeatures = data.features;
+
+                loadingDiv.style.display = 'none';
+                searchBtn.disabled = false;
+            } catch (error) {
+                console.error("Error loading data:", error);
+
+                // Check if it's likely a CORS/local file issue
+                if (window.location.protocol === 'file:') {
+                    loadingText.innerHTML = 'Error: Cannot load data from a local file protocol (file://).<br><br>Please run a local server (e.g., using VS Code Live Server, Python HTTP server, or Node.js).';
+                    loadingText.style.color = '#e03131';
+                    document.querySelector('.spinner').style.display = 'none';
+                } else {
+                    loadingText.innerText = "Error loading data: " + error.message;
+                    loadingText.style.color = '#e03131';
+                    document.querySelector('.spinner').style.display = 'none';
+                }
+            }
         }
-    };
 
-    // Add GeoJSON to map
-    var geoLayer = L.geoJSON(geojsonData, {
-        style: {
-            color: "blue",
-            weight: 2,
-            fillColor: "lightblue",
-            fillOpacity: 0.4
-        },
-        onEachFeature: function (feature, layer) {
-            layer.bindPopup(
-                "<b>Pincode:</b> " + feature.properties.Pincode + "<br>" +
-                "<b>Office:</b> " + feature.properties.Office_Name + "<br>" +
-                "<b>Division:</b> " + feature.properties.Division + "<br>" +
-                "<b>Region:</b> " + feature.properties.Region + "<br>" +
-                "<b>Circle:</b> " + feature.properties.Circle
-            );
+        // Call loadData immediately
+        loadData();
+
+        function searchPincode() {
+            errorMsg.innerText = '';
+            const searchVal = pincodeInput.value.trim();
+
+            if (!searchVal) {
+                errorMsg.innerText = 'Please enter a pincode';
+                return;
+            }
+
+            if (allFeatures.length === 0) {
+                errorMsg.innerText = 'Data not loaded yet. Please wait or check for errors.';
+                return;
+            }
+
+            // Find match
+            const match = allFeatures.find(f => f.properties.Pincode == searchVal);
+
+            if (match) {
+                // Remove previous layer
+                if (currentLayer) {
+                    map.removeLayer(currentLayer);
+                }
+
+                // Draw new layer
+                currentLayer = L.geoJSON(match, {
+                    style: {
+                        color: "#228be6",
+                        weight: 3,
+                        fillColor: "#74c0fc",
+                        fillOpacity: 0.5
+                    },
+                    onEachFeature: function (feature, layer) {
+                        layer.bindPopup(
+                            "<div style='font-family: Arial;'>" +
+                            "<h3 style='margin: 0 0 8px 0; color: #1c7ed6;'>Pincode: " + (feature.properties.Pincode || "N/A") + "</h3>" +
+                            "<b>Office:</b> " + (feature.properties.Office_Name || "N/A") + "<br>" +
+                            "<b>Division:</b> " + (feature.properties.Division || "N/A") + "<br>" +
+                            "<b>Region:</b> " + (feature.properties.Region || "N/A") + "<br>" +
+                            "<b>Circle:</b> " + (feature.properties.Circle || "N/A") +
+                            "</div>"
+                        );
+                    }
+                }).addTo(map);
+
+                // Fit bounds
+                map.fitBounds(currentLayer.getBounds());
+                currentLayer.openPopup();
+            } else {
+                errorMsg.innerText = 'Pincode not found!';
+            }
         }
-    }).addTo(map);
 
-    // Fit map to polygon bounds
-    map.fitBounds(geoLayer.getBounds());
+        searchBtn.addEventListener('click', searchPincode);
+        pincodeInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchPincode();
+            }
+        });
 
-</script>
+    </script>
 
 </body>
+
 </html>
