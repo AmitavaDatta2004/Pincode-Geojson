@@ -33,8 +33,10 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the interactive map.
-Open [http://localhost:3000/documentation](http://localhost:3000/documentation) for the API docs.
+Open [http://localhost:3000](http://localhost:3000) to see the interactive map locally.
+Open [http://localhost:3000/documentation](http://localhost:3000/documentation) for the local API docs.
+
+> **Using the deployed version?** → [https://fetchpin.vercel.app](https://fetchpin.vercel.app)
 
 ---
 
@@ -44,7 +46,22 @@ Open [http://localhost:3000/documentation](http://localhost:3000/documentation) 
 
 Returns the complete GeoJSON `Feature` for a given 6-digit Indian pincode.
 
-**Example:**
+### 🌐 Base URL
+
+| Environment | Base URL |
+|-------------|----------|
+| **Local** (self-hosted) | `http://localhost:3000` |
+| **Deployed** (Vercel) | `https://fetchpin.vercel.app` |
+
+> If you are running this project locally with `npm run dev`, use `http://localhost:3000/api/pincode/[code]`.  
+> If you just want to use the API without setting anything up, use the deployed URL directly.
+
+**Example (deployed):**
+```bash
+curl https://fetchpin.vercel.app/api/pincode/700091
+```
+
+**Example (local):**
 ```bash
 curl http://localhost:3000/api/pincode/700091
 ```
@@ -86,7 +103,7 @@ export default function PincodeMap({ pincode }: { pincode: string }) {
   const [boundary, setBoundary] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/pincode/${pincode}`)
+    fetch(`https://fetchpin.vercel.app/api/pincode/${pincode}`)
       .then(r => r.json())
       .then(setBoundary);
   }, [pincode]);

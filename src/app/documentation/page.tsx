@@ -3,9 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const CODE_CURL = `curl https://your-domain.com/api/pincode/700091`;
+const CODE_CURL_LOCAL = `curl http://localhost:3000/api/pincode/700091`;
+const CODE_CURL_DEPLOYED = `curl https://fetchpin.vercel.app/api/pincode/700091`;
 
-const CODE_FETCH = `const response = await fetch('/api/pincode/700091');
+const CODE_FETCH_LOCAL = `const response = await fetch('http://localhost:3000/api/pincode/700091');
+const data = await response.json();
+console.log(data);`;
+
+const CODE_FETCH_DEPLOYED = `const response = await fetch('https://fetchpin.vercel.app/api/pincode/700091');
 const data = await response.json();
 console.log(data);`;
 
@@ -48,22 +53,22 @@ export default function PincodeMap({ pincode }: { pincode: string }) {
 }`;
 
 const CODE_RESPONSE_OK = `{
-  "type": "Feature",
-  "properties": {
-    "Pincode": "700091",
-    "Office_Name": "Sech Bhawan SO",
-    "Division": "Kolkata East",
-    "Region": "Kolkata",
-    "Circle": "West Bengal"
-  },
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [[[88.4117, 22.5848], [88.4187, 22.5833], ...]]
-  }
+    "type": "Feature",
+        "properties": {
+        "Pincode": "700091",
+            "Office_Name": "Sech Bhawan SO",
+                "Division": "Kolkata East",
+                    "Region": "Kolkata",
+                        "Circle": "West Bengal"
+    },
+    "geometry": {
+        "type": "Polygon",
+            "coordinates": [[[88.4117, 22.5848], [88.4187, 22.5833], ...]]
+    }
 }`;
 
 const CODE_RESPONSE_404 = `{
-  "error": "Boundary data not found for pincode: 123456"
+    "error": "Boundary data not found for pincode: 123456"
 }`;
 
 type Tab = 'curl' | 'fetch' | 'react';
@@ -107,6 +112,10 @@ export default function DocsPage() {
     const [liveError, setLiveError] = useState('');
     const [liveLoading, setLiveLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<Tab>('curl');
+    const [useLocal, setUseLocal] = useState(false);
+
+    const CODE_CURL = useLocal ? CODE_CURL_LOCAL : CODE_CURL_DEPLOYED;
+    const CODE_FETCH = useLocal ? CODE_FETCH_LOCAL : CODE_FETCH_DEPLOYED;
 
     const testApi = async () => {
         setLiveError('');
@@ -177,6 +186,38 @@ export default function DocsPage() {
                     <div>
                         <h2 className="text-2xl font-bold text-white mb-1">Endpoint</h2>
                         <p className="text-gray-400 text-sm">Single endpoint. No authentication required.</p>
+                    </div>
+
+                    {/* Base URL Notice */}
+                    <div className="rounded-xl border border-blue-700/40 bg-blue-900/20 p-5 space-y-3">
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                            <div>
+                                <p className="text-blue-300 font-bold text-sm mb-1">🌐 Choose your Base URL</p>
+                                <p className="text-gray-400 text-xs">Use the deployed URL directly — or clone the repo and run locally.</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs">
+                                <span className={!useLocal ? 'text-blue-400 font-bold' : 'text-gray-500'}>Deployed</span>
+                                <button
+                                    onClick={() => setUseLocal(l => !l)}
+                                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${useLocal ? 'bg-green-600' : 'bg-blue-600'}`}
+                                >
+                                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${useLocal ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                </button>
+                                <span className={useLocal ? 'text-green-400 font-bold' : 'text-gray-500'}>Local</span>
+                            </div>
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-3">
+                            <div className={`rounded-lg border p-3 transition-all ${!useLocal ? 'border-blue-500/60 bg-blue-900/30' : 'border-gray-700 opacity-50'}`}>
+                                <p className="text-xs text-gray-400 mb-1 font-semibold">☁️ Deployed (Vercel)</p>
+                                <code className="text-blue-300 font-mono text-xs break-all">https://fetchpin.vercel.app</code>
+                                <p className="text-gray-500 text-xs mt-1">No setup needed. Use directly.</p>
+                            </div>
+                            <div className={`rounded-lg border p-3 transition-all ${useLocal ? 'border-green-500/60 bg-green-900/20' : 'border-gray-700 opacity-50'}`}>
+                                <p className="text-xs text-gray-400 mb-1 font-semibold">💻 Local (Self-hosted)</p>
+                                <code className="text-green-300 font-mono text-xs">http://localhost:3000</code>
+                                <p className="text-gray-500 text-xs mt-1">Run: <code className="text-gray-300">npm install && npm run dev</code></p>
+                            </div>
+                        </div>
                     </div>
                     <div className="rounded-xl border border-gray-700 overflow-hidden">
                         <div className="flex items-center gap-4 px-5 py-4 bg-gray-800/60">
