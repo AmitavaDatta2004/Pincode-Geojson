@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Indian Pincode Map & GeoJSON API
 
-## Getting Started
+This project contains two major components:
+1. **Interactive Map**: A Next.js frontend map that visualizes Indian Pincode boundaries instantly.
+2. **REST API**: A high-performance Next.js API route that retrieves official GeoJSON boundary polygons for any given Indian Pincode, parsing through ~90MB of geo-data.
 
-First, run the development server:
+You can use the frontend to visually search pincodes, or expose this API endpoint in any of your independent Next.js or React projects to instantly draw postal boundaries on maps (like Leaflet, Mapbox, or Google Maps) without forcing your clients to download large geospatial datasets.
+
+---
+
+## 🚀 Getting Started Locally
+
+First, install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the interactive Pincode search map.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📡 API Endpoint Details
 
-## Learn More
+### `GET /api/pincode/[code]`
 
-To learn more about Next.js, take a look at the following resources:
+Fetches the complete GeoJSON `Feature` object for a specific 6-digit Indian pincode.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**URL Parameters:**
+- `[code]` (string, required): The 6-digit Indian Pincode you are querying.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Example Request:**
+```bash
+curl http://localhost:3000/api/pincode/700091
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 💻 API Response Usage Examples
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. Success Response (200 OK)
+Returns a standard GeoJSON `Feature` object.
+
+```json
+{
+  "type": "Feature",
+  "properties": {
+    "Pincode": "700091",
+    "Office_Name": "Sech Bhawan SO",
+    "Division": "Kolkata East",
+    "Region": "Kolkata",
+    "Circle": "West Bengal"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [88.411716, 22.584842],
+        [88.418699, 22.583301],
+        /* ... shortened ... */
+        [88.411716, 22.584842]
+      ]
+    ]
+  }
+}
+```
+
+### 2. Usage in Another Next.js App using React-Leaflet
+
+To render the returned Pincode boundary on a remote application using React-Leaflet:
+
+```tsx
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+
+export default function RemotePincodeMap({ pincode = '700091' }) {
+  const [boundary, setBoundary] = useState(null);
+
+  useEffect(() => {
+    async function fetchBoundary() {
+      // Point this URL to your deployed or locally running Next.js API
+      const res = await fetch(`http://localhost:3000/api/pincode/${pincode}`);
+      if (res.ok) {
+        const geojsonData = await res.json();
+        setBoundary(geojsonData);
+      } else {
+        console.error("Pincode not found!");
+      }
+    }
+    fetchBoundary();
+  }, [pincode]);
+
+  return (
+    <div style={{ height: '400px', width: '100%' }}>
+      <MapContainer center={[22.584842, 88.411716]} zoom={13} style={{ height: '100%' }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        
+        {/* Pass API Response directly to the Data prop */}
+        {boundary && <GeoJSON data={boundary} />}
+        
+      </MapContainer>
+    </div>
+  );
+}
+```
+
+### 3. Error Responses
+
+- **400 Bad Request**: Invalid pincode format provided.
+- **404 Not Found**: The requested pincode does not exist in the boundary dataset.
+- **500 Internal Server Error**: The server failed to parse the underlying GeoJSON database.
+
+```json
+{
+  "error": "Boundary data not found for pincode: 123456"
+}
+```
+
+---
+
+## ⚡ Performance Considerations
+
+The underlying official GeoJSON dataset is approximately ~90MB. The API caches this object in memory upon the first request globally within the Node process. Subsequent requests to the API skip heavy file I/O operations and instantly search the cached JSON array in memory, returning response objects in just a few milliseconds.
